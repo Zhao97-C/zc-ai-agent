@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * Spring AI 调用示例
  */
-@Component
+//@Component
 public class SpringAiInvoke implements CommandLineRunner {
 
     @Resource
