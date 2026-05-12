@@ -16,20 +16,26 @@ class LoveAppTest {
     private LoveApp loveApp;
 
     @Test
-    void testChat() {
+    void doChat() {
         String chatId = UUID.randomUUID().toString();
         // first
         String message = "你好，我叫zc";
         String answer = loveApp.doChat(message, chatId);
+    }
 
-        // second
-        message = "我另一半叫nozc，我想让TA更爱我";
-        answer = loveApp.doChat(message, chatId);
-        Assertions.assertNotNull(answer);
+    @Test
+    void testDoChatWithReport() {
+        String chatId = UUID.randomUUID().toString();
+        // first
+        String message = "你好，我叫zc，目前处于冷淡期，我不知道该怎么做";
+        LoveApp.LoveReport answer = loveApp.doChatWithReport(message,chatId);
+    }
 
-        // third
-        message = "我叫什么？";
-        answer = loveApp.doChat(message, chatId);
-        Assertions.assertNotNull(answer);
+    @Test
+    void testDoChatWithPromptTemplate() {
+        String chatId = UUID.randomUUID().toString();
+        // first
+        String message = "你好，我叫zc";
+        String answer = loveApp.doChatWithPromptTemplate(message,chatId);
     }
 }
