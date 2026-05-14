@@ -1,25 +1,24 @@
 package com.nozc.zcaiagent.app;
 
 import com.nozc.zcaiagent.advisor.MyLoggerAdvisor;
-import com.nozc.zcaiagent.advisor.SensitiveWord2Advisor;
 import com.nozc.zcaiagent.advisor.SensitiveWordAdvisor;
-import com.nozc.zcaiagent.chatmemory.FileBasedChatMemory;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.name;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
@@ -43,6 +42,7 @@ public class LoveApp {
                         new SensitiveWordAdvisor("src/main/resources/sensitive-words.txt"),
                         new MessageChatMemoryAdvisor(chatMemory),
                         new MyLoggerAdvisor(0)
+
 //                        ,new ReReadingAdvisor(0)
                 )
                 .build();
@@ -91,6 +91,24 @@ public class LoveApp {
                 .user(message)
                 .advisors(spce -> spce.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("chatResponse: {}", content);
+        return content;
+    }
+
+    @Resource
+    private VectorStore MyVectorStore;
+
+    public String doChatWithVectorStore(String message, String chatId) {
+
+        ChatResponse chatResponse = chatClient.prompt()
+                .user(message)
+                .advisors(spce -> spce.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                .advisors(new MyLoggerAdvisor(10))
+                .advisors(new QuestionAnswerAdvisor(MyVectorStore))
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();

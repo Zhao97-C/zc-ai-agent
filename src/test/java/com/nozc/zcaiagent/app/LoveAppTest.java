@@ -38,4 +38,17 @@ class LoveAppTest {
         String message = "你好，我叫zc";
         String answer = loveApp.doChatWithPromptTemplate(message,chatId);
     }
+
+    @Test
+    void testPrint() {
+        System.out.println("Hello, World!");
+    }
+
+    @Test
+    void doChatWithVectorStore() {
+        String chatId = UUID.randomUUID().toString();
+        // first
+        String message = "我已经结婚了，但婚后关系不太和谐，怎么办";
+        String answer = loveApp.doChatWithVectorStore(message,chatId);
+    }
 }
